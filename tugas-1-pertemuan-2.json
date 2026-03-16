@@ -1,0 +1,209 @@
+{
+  "name": "tugas-1-pertemuan-2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        -272
+      ],
+      "id": "dada6225-564e-4fcc-9ff0-8c0bbec213cd",
+      "name": "Telegram Trigger",
+      "webhookId": "d22a97ed-f87f-4e48-abb9-bbb0e884b10a",
+      "credentials": {
+        "telegramApi": {
+          "id": "27SjBNx4QzpemsG8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=Anda adalah asisten spesialis Digital Marketing.\n\nTugas Anda adalah menjawab pertanyaan tentang:\n- SEO\n- Email Marketing\n- Strategi pemasaran digital\n\nBerikan jawaban yang jelas, singkat, dan mudah dipahami dan ambil langsung jawaban dari google sheets yang telah tersedia. Di akhir jawaban tambahkan kalimat terima kasih, Ka {{ $json.message.from.first_name}}\n\nJika pertanyaan tidak berkaitan dengan digital marketing,\nberi tahu bahwa chatbot hanya menjawab topik digital marketing."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -272
+      ],
+      "id": "c310b1d1-7ebd-44b9-ae92-9c024e383695",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "6de8a2ec-e360-4f78-a3ff-b2b30e58ac0e",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "WiFXFXzlZi6GURd1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        704,
+        -272
+      ],
+      "id": "46b562a6-8a79-49e2-a715-4cb23bd0f521",
+      "name": "Send a text message",
+      "webhookId": "a070e0c5-51fc-4786-a378-307e147e547a",
+      "credentials": {
+        "telegramApi": {
+          "id": "27SjBNx4QzpemsG8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.message_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "e5464168-7b3c-45ec-9bfb-2ebee9a84455",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Gunakan tool ini untuk membaca data produk dari Google Sheets.\n\nJANGAN mengirim parameter tambahan seperti:\nHeader row\nRange row\nRange col\nSheet name\n\nTool ini sudah dikonfigurasi untuk membaca seluruh data sheet.\nAnda hanya perlu memanggil tool tanpa parameter tambahan.\n\nSetelah data didapat, gunakan data tersebut untuk menjawab pertanyaan pengguna.",
+        "documentId": {
+          "__rl": true,
+          "value": "1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA",
+          "mode": "list",
+          "cachedResultName": "Salinan dari n8n 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        -48
+      ],
+      "id": "f713d8bc-02c2-4129-9727-bc3fbcdf242b",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hOrATzh46pEHWise",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c7ece500-85c4-41bf-9c47-671d05f3a739",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "04f587a7bd4c6ab19f9441cc23f8fc16d10529d35b0e4ddad8908497c7071ad1"
+  },
+  "id": "4afDOXs4MAvPY3AE",
+  "tags": []
+}
