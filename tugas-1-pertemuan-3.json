@@ -1,0 +1,166 @@
+{
+  "name": "tugas-1-pertemuan-3",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Anda adalah asisten spesialis Digital Marketing.\n\nTugas Anda adalah menjawab pertanyaan tentang:\n- SEO\n- Email Marketing\n- Strategi pemasaran digital\n\nBerikan jawaban yang jelas, singkat, dan mudah dipahami dan ambil langsung jawaban dari google sheets yang telah tersedia. Di akhir jawaban tambahkan kalimat terima kasih, Ka {{ $json.message.from.first_name}}\n\nJika pertanyaan tidak berkaitan dengan digital marketing,\nberi tahu bahwa chatbot hanya menjawab topik digital marketing."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -24,
+        240
+      ],
+      "id": "2f59cc8c-034d-4f6d-8803-c20cff61f547",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        464
+      ],
+      "id": "b5117bf0-7805-4b19-92e0-08d9cb8829b0",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Gneu00i6ibWEBSJw",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        464
+      ],
+      "id": "8bed584f-d58c-4322-a33a-ddb0003e4b07",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Gunakan tool ini untuk membaca data produk dari Google Sheets.\n\nJANGAN mengirim parameter tambahan seperti:\nHeader row\nRange row\nRange col\nSheet name\n\nTool ini sudah dikonfigurasi untuk membaca seluruh data sheet.\nAnda hanya perlu memanggil tool tanpa parameter tambahan.\n\nSetelah data didapat, gunakan data tersebut untuk menjawab pertanyaan pengguna.",
+        "documentId": {
+          "__rl": true,
+          "value": "1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA",
+          "mode": "list",
+          "cachedResultName": "Salinan dari n8n 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhBOACe5Q-hs6ogIFYDPGFfR_1E62kkLuFN0l_76VtA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        464
+      ],
+      "id": "0e833e13-52ae-44d2-95e4-fbc08cf16f89",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VaWUJEP7iuiijpHS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -224,
+        240
+      ],
+      "id": "b930c8ce-5c15-4399-9e7a-d72fd62e22de",
+      "name": "When chat message received",
+      "webhookId": "2c12b9a6-ff11-4593-aac0-431f1c4ddf2c"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fe8f5273-a4ca-4e09-a7ce-c25919a4d20b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "df546d4de5157fa1c7b69582cb72f6572011a520a5fa57642bdc2e7ce1f74a37"
+  },
+  "id": "6oR7knS5oFIPl0oj",
+  "tags": []
+}
